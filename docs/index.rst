@@ -69,7 +69,9 @@ Usage as SDK/library
    obj = IntelOwl(
       "<your_api_key>",
       "<your_intelowl_instance_url>",
-      "optional<path_to_pem_file>"
+      "optional<path_to_pem_file>",
+      "optional<http_proxy>",
+      "optional<https_proxy>"
    )
    """
 

@@ -24,12 +24,16 @@ class IntelOwl:
         token: str,
         instance_url: str,
         certificate: str = None,
+        http_proxy: str = None,
+        https_proxy: str = None,
         logger: logging.Logger = None,
         cli: bool = False,
     ):
         self.token = token
         self.instance = instance_url
         self.certificate = certificate
+        self.http_proxy = http_proxy
+        self.https_proxy = https_proxy
         self.cli = cli
         if logger:
             self.logger = logger
@@ -45,6 +49,12 @@ class IntelOwl:
             session = requests.Session()
             if self.certificate is not True:
                 session.verify = self.certificate
+            if self.http_proxy or self.https_proxy:
+                session.proxies = {}
+                if self.http_proxy:
+                    session.proxies["http"] = self.http_proxy
+                if self.https_proxy:
+                    session.proxies["https"] = self.https_proxy
             session.headers.update(
                 {
                     "Authorization": f"Token {self.token}",

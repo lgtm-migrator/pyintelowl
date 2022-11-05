@@ -12,12 +12,24 @@ from .pyintelowl import IntelOwl
 @click.version_option(version=get_version_number())
 @click_creds.use_netrcstore(
     name="pyintelowl",
-    mapping={"login": "certificate", "password": "api_key", "account": "instance_url"},
+    mapping={
+        "login": "certificate",
+        "password": "api_key",
+        "account": "instance_url",
+        "http_proxy": "http_proxy",
+        "https_proxy": "https_proxy",
+    },
 )
 @click.pass_context
 def cli(ctx: ClickContext, debug: bool):
     host = click_creds.get_netrc_object_from_ctx(ctx).host.copy()
-    api_key, url, cert = host["password"], host["account"], host["login"]
+    api_key, url, cert, http_proxy, https_proxy = (
+        host["password"],
+        host["account"],
+        host["login"],
+        host.get("http_proxy", ""),
+        host.get("https_proxy", ""),
+    )
     if (not api_key or not url) and ctx.invoked_subcommand != "config":
         click.echo("Hint: Use `config set` to set config variables!")
         exit()
@@ -27,7 +39,9 @@ def cli(ctx: ClickContext, debug: bool):
             cert = False
         elif cert in ["None", "True"]:
             cert = True
-        ctx.obj = IntelOwl(api_key, url, cert, logger, cli=True)
+        ctx.obj = IntelOwl(
+            api_key, url, cert, http_proxy, https_proxy, logger, cli=True
+        )
 
 
 # Compile all groups and commands

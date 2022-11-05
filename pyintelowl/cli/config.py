@@ -26,7 +26,7 @@ def config_get(netrc: click_creds.NetrcStore):
 @click.option(
     "-k",
     "--api-key",
-    required=True,
+    required=False,
     help="API key to authenticate against a IntelOwl instance",
 )
 @click.option(
@@ -53,8 +53,30 @@ def config_get(netrc: click_creds.NetrcStore):
     type=click.BOOL,
     help="Boolean determining whether certificate validation is enforced",
 )
+@click.option(
+    "-p",
+    "--http-proxy",
+    required=False,
+    default="",
+    help="HTTP proxy URL",
+)
+@click.option(
+    "-ps",
+    "--https-proxy",
+    required=False,
+    default="",
+    help="HTTPS proxy URL",
+)
 @click.pass_context
-def config_set(ctx: ClickContext, api_key, instance_url, certificate, verify):
+def config_set(
+    ctx: ClickContext,
+    api_key,
+    instance_url,
+    certificate,
+    verify,
+    http_proxy,
+    https_proxy,
+):
     """
     Set/Edit config variables
     """
@@ -68,6 +90,10 @@ def config_set(ctx: ClickContext, api_key, instance_url, certificate, verify):
         new_host["login"] = certificate
     if verify is False:
         new_host["login"] = False
+    if http_proxy:
+        new_host["http_proxy"] = http_proxy
+    if https_proxy:
+        new_host["https_proxy"] = https_proxy
     # finally save
     netrc.save(new_host)
-    ctx.obj.logger.info("Successfully saved config variables!")
+    ctx.obj.logger.info(f"Successfully saved config variables! {new_host}")
